@@ -255,16 +255,33 @@ services:
       dns:
         - 172.22.1.254
       dns_search: mailcow-network
-      ports:
-        - "${HTTPS_BIND:-0.0.0.0}:${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"
-        - "${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-80}:${HTTP_PORT:-80}"
       restart: always
       networks:
         mailcow-network:
           ipv4_address: 172.22.1.251
           aliases:
             - nginx
-
+   
+    caddy-mailcow:
+       depends_on:
+         - nginx-mailcow
+       image: hub.gassmann.it/docker/caddy
+       ports:
+         - "${HTTPS_BIND:-0.0.0.0}:${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"
+         - "${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-80}:${HTTP_PORT:-80}"
+       volumes:
+         - ./data/caddy/Caddyfile:/etc/Caddyfile
+         - ./data/certs:/etc/caddycerts
+       environment:
+          - CADDYPATH=/etc/caddycerts
+          - MAILCOW_HOSTNAME=${MAILCOW_HOSTNAME}
+          - MAILCOW_HOSTNAME_AUTODISCOVER=${MAILCOW_HOSTNAME_AUTODISCOVER}
+          - MAILCOW_HOSTNAME_AUTOCONFIG=${MAILCOW_HOSTNAME_AUTOCONFIG}
+       networks:
+         mailcow-network:
+           ipv4_address: 172.22.1.250
+           aliases:
+             - caddy
     ipv6nat:
       image: robbertkl/ipv6nat
       restart: always
@@ -273,6 +290,8 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock:ro
         - /lib/modules:/lib/modules:ro
+
+ 
 
 networks:
   mailcow-network:

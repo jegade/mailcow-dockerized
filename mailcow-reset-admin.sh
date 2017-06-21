@@ -18,7 +18,7 @@ read -r -p "Are you sure you want to reset the mailcow administrator account? [y
 response=${response,,}    # tolower
 if [[ "$response" =~ ^(yes|y)$ ]]; then
         echo -e "\nWorking, please wait..."
-        source mailcow.conf
+        source ./mailcow.conf
         docker-compose exec -T mysql-mailcow mysql -u${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM admin;"
         docker-compose exec -T mysql-mailcow mysql -u${DBUSER} -p${DBPASS} ${DBNAME} -e "INSERT INTO admin (username, password, superadmin, created, modified, active) VALUES ('admin', '{SSHA256}K8eVJ6YsZbQCfuJvSUbaQRLr0HPLz5rC9IAp0PAFl0tmNDBkMDc0NDAyOTAxN2Rk', 1, NOW(), NOW(), 1);"
         docker-compose exec -T mysql-mailcow mysql -u${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM domain_admins WHERE username='admin';"

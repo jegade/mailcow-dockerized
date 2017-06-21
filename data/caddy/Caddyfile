@@ -1,0 +1,13 @@
+{$MAILCOW_HOSTNAME},
+{$MAILCOW_HOSTNAME_AUTODISCOVER},
+{$MAILCOW_HOSTNAME_AUTOCONFIG} { 
+
+	tls jens.gassmann@atomix.de
+
+	proxy / nginx-mailcow:80 {
+
+		transparent
+	}
+}
+
+
